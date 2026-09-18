@@ -48,14 +48,14 @@ def teacher_screen():
         st.success("✨ Liveness check passed successfully!")
         
         # User Identifier Input (Simulating system backend checking)
-        employee_id = st.text_input("Enter your Employee/Student ID to finalize:")
+        employee_id = st.text_input("Enter your Student ID to finalize:")
         
         if st.button("Mark Attendance"):
             if employee_id:
                 # PLACEHOLDER: Insert your facial recognition / DB verification functions here
                 st.session_state.attendance_marked = True
                 st.balloons()
-                st.success(f"Success: Attendance logged for ID {employee_id} at {time.strftime('%H:%M:%S')}!")
+                st.success(f"Success: Attendance logged for ID {student_id} at {time.strftime('%H:%M:%S')}!")
             else:
                 st.warning("Please provide a valid ID.")
     elif not is_live:
