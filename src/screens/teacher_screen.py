@@ -17,8 +17,62 @@ import pandas as pd
 from datetime import datetime
 from src.database.config import supabase
 from src.components.dialog_voice_attendance import voice_attendance_dialog
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, WebRtcMode
+import cv2
+import mediapipe as mp
 
 def teacher_screen():
+
+    st.set_page_config(page_title="AI Smart Attendance", page_icon="🔒")
+    st.title("🔒 Smart AI Attendance - Liveness Check")
+    st.write("Please blink twice naturally in front of the camera to verify you are a physical person.")
+
+    # Session state initialization
+    if "attendance_marked" not in st.session_state:
+        st.session_state.attendance_marked = False
+
+    # Webrtc Context setup
+    ctx = webrtc_streamer(
+        key="liveness-check",
+        mode=WebRtcMode.SENDRECV,
+        video_transformer_factory=LivenessTransformer,
+        rtc_configuration={"iceServers": [{"urls": ["stun:://google.com"]}]},
+        media_stream_constraints={"video": True, "audio": False},
+    )
+
+    #process logic validation outside the frame loop
+    if ctx.video_transformer:
+    is_live = ctx.video_transformer.liveness_confirmed
+    
+    if is_live and not st.session_state.attendance_marked:
+        st.success("✨ Liveness check passed successfully!")
+        
+        # User Identifier Input (Simulating system backend checking)
+        employee_id = st.text_input("Enter your Employee/Student ID to finalize:")
+        
+        if st.button("Mark Attendance"):
+            if employee_id:
+                # PLACEHOLDER: Insert your facial recognition / DB verification functions here
+                st.session_state.attendance_marked = True
+                st.balloons()
+                st.success(f"Success: Attendance logged for ID {employee_id} at {time.strftime('%H:%M:%S')}!")
+            else:
+                st.warning("Please provide a valid ID.")
+    elif not is_live:
+        st.info("Waiting for real-time blink validation...")
+
+if st.session_state.attendance_marked:
+    if st.button("Reset System for Next Scan"):
+        st.session_state.attendance_marked = False
+        st.rerun()
+
+
+
+
+
+
+
+
 
     style_background_dashboard()
     style_base_layout()
